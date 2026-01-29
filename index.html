@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2487.3">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="it"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Matrix Gym Protocol v5.0&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/150/00FF41/matrix-desktop.png"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>:root { --matrix-green: #00FF41; --dark-bg: #000; --card-bg: rgba(0, 20, 0, 0.95); --ss-red: #ff3131; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body { background-color: var(--dark-bg); color: var(--matrix-green); font-family: 'Courier New', Courier, monospace; margin: 0; overflow-x: hidden; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>#matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.15; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.container { padding: 15px; max-width: 600px; margin: auto; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>h1, h2 { text-transform: uppercase; text-align: center; border-bottom: 2px solid var(--matrix-green); padding-bottom: 10px; text-shadow: 0 0 10px var(--matrix-green); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.card { background: var(--card-bg); border: 1px solid var(--matrix-green); border-radius: 8px; padding: 15px; margin-bottom: 20px; position: relative; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.ss-card { border: 2px solid var(--ss-red); box-shadow: 0 0 15px rgba(255, 49, 49, 0.4); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.sets-counter { position: absolute; top: 10px; right: 10px; font-size: 1.8rem; font-weight: bold; border: 1px solid var(--matrix-green); padding: 5px; background: rgba(0,255,65,0.1); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.btn { background: transparent; color: var(--matrix-green); border: 1px solid var(--matrix-green); width: 100%; padding: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 10px; font-size: 1rem; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.btn:active { background: var(--matrix-green); color: black; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.timer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.timer-display { font-size: 5rem; text-shadow: 0 0 20px var(--matrix-green); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.alarm-active { animation: flash red 0.5s infinite; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@keyframes flash { 50% { background-color: #600; } }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.hidden { display: none; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>input { background: black; border: 1px solid var(--matrix-green); color: var(--matrix-green); width: 80px; text-align: center; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;canvas id="matrix-bg"&gt;&lt;/canvas&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;div id="unlock-screen" class="timer-overlay"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h2&gt;&gt; PROTOCOLLO_MATRIX&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;p style="padding: 20px;"&gt;ATTIVA IL SISTEMA PER ABILITARE L'ALLARME DI FINE RECUPERO&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="btn" style="width: 80%; font-size: 1.5rem;" onclick="initAudio()"&gt;INIZIALIZZA&lt;/button&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;div class="container hidden" id="home"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;&gt; SYSTEM_ONLINE&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;canvas id="progressChart"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="btn" onclick="openDay(1)"&gt;BOOT: GIORNO_1 (Gambe/Spalle)&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="btn" onclick="openDay(2)"&gt;BOOT: GIORNO_2 (Dorso/Petto)&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="btn" onclick="openDay(3)"&gt;BOOT: GIORNO_3 (Mix)&lt;/button&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;div class="container hidden" id="workout-view"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="btn" style="border:none; color:#666;" onclick="location.reload()"&gt;[ ESCI_SESSIONE ]&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h2 id="current-day-title"&gt;&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="exercise-list"&gt;&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;div id="timer-overlay" class="timer-overlay hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="timer-label" style="font-size: 1.5rem;"&gt;RECUPERO_IN_CORSO&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="timer-display" id="timer-text"&gt;00:00&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="stop-btn" class="btn hidden" style="border-color: var(--ss-red); color: var(--ss-red); font-size: 2rem; width: 80%;" onclick="stopAlarm()"&gt;🛑 STOP ALLARME&lt;/button&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1">let audioCtx, mainGain, oscillator, alarmInterval;</p>
+<p class="p1">let currentSets = {};</p>
+<p class="p1">let activeInterval;</p>
+<p class="p2"><br></p>
+<p class="p1">const workoutData = {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>1: [</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ name: "AFFONDI + LEG CURL SEDUTO", total: 4, rest: 120, ss: true, last: "40/45kg" },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ name: "LEG CURL", total: 4, rest: 90, ss: false, last: "30kg" },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ name: "SHOULDER PRESS PRONA", total: 4, rest: 120, ss: false, last: "30kg" },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ name: "ALZATE LATERALI SEDUTO", total: 4, rest: 120, ss: false, last: "5kg" }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>],</p>
+<p class="p1"><span class="Apple-converted-space">    </span>2: [</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ name: "LAT MACHINE PRESA LARGA", total: 4, rest: 90, ss: false, last: "40kg" },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ name: "PULLEY BASSO", total: 4, rest: 120, ss: false, last: "30kg" },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ name: "PANCA INCLINATA", total: 5, rest: 90, ss: false, last: "12.5kg" }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>],</p>
+<p class="p1"><span class="Apple-converted-space">    </span>3: [</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ name: "STEP UP SU BOX", total: 4, rest: 90, ss: false, last: "40kg" },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ name: "LEG EXTENSION", total: 5, rest: 120, ss: false, last: "45kg" },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{ name: "SS: ALZATE FRONT + SHOULDER", total: 4, rest: 120, ss: true, last: "12/25kg" }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>]</p>
+<p class="p1">};</p>
+<p class="p2"><br></p>
+<p class="p1">function initAudio() {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>audioCtx = new (window.AudioContext || window.webkitAudioContext)();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mainGain = audioCtx.createGain();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mainGain.connect(audioCtx.destination);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('unlock-screen').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('home').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>initChart();</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function openDay(day) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('home').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('workout-view').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('current-day-title').innerText = "GIORNO_" + day;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let html = "";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>workoutData[day].forEach((ex, idx) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const id = `d${day}_e${idx}`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>currentSets[id] = 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>html += `</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="card ${ex.ss ? 'ss-card' : ''}"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="sets-counter" id="cnt-${id}"&gt;0/${ex.total}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;strong&gt;${ex.ss ? '🔥 ' : ''}${ex.name}&lt;/strong&gt;&lt;br&gt;&lt;br&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span&gt;ULTIMO: &lt;input type="text" value="${ex.last}"&gt;&lt;/span&gt;&lt;br&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="btn" style="margin-top:10px;" onclick="handleNextSet('${id}', ${ex.total}, ${ex.rest})"&gt;SERIE COMPLETA&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('exercise-list').innerHTML = html;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function handleNextSet(id, total, rest) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (currentSets[id] &lt; total) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>currentSets[id]++;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById(`cnt-${id}`).innerText = `${currentSets[id]}/${total}`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>startTimer(rest);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function startTimer(sec) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>clearInterval(activeInterval);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('timer-overlay').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('stop-btn').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('timer-label').innerText = "RECUPERO_IN_CORSO";</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let timeLeft = sec;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>activeInterval = setInterval(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let m = Math.floor(timeLeft / 60);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let s = timeLeft % 60;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('timer-text').innerText = `${m}:${s &lt; 10 ? '0' : ''}${s}`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (timeLeft &lt;= 0) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>clearInterval(activeInterval);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>triggerAlarm();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>timeLeft--;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}, 1000);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function triggerAlarm() {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('timer-label').innerText = "🚨 TORNA AL LAVORO! 🚨";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('timer-overlay').classList.add('alarm-active');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('stop-btn').classList.remove('hidden');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>alarmInterval = setInterval(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>oscillator = audioCtx.createOscillator();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>oscillator.type = 'sawtooth';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>oscillator.frequency.setValueAtTime(Math.random() * 400 + 800, audioCtx.currentTime);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>oscillator.connect(mainGain);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>mainGain.gain.setValueAtTime(0.2, audioCtx.currentTime);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>oscillator.start();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>oscillator.stop(audioCtx.currentTime + 0.3);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(navigator.vibrate) navigator.vibrate(400);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}, 500);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function stopAlarm() {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>clearInterval(alarmInterval);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('timer-overlay').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('timer-overlay').classList.remove('alarm-active');</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function initChart() {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const ctx = document.getElementById('progressChart').getContext('2d');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>new Chart(ctx, {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>type: 'line',</p>
+<p class="p1"><span class="Apple-converted-space">        </span>data: {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>labels: ['Sett 1', 'Sett 10'],</p>
+<p class="p1"><span class="Apple-converted-space">            </span>datasets: [{ label: 'Carichi (kg)', data: [10, 45], borderColor: '#00FF41' }]</p>
+<p class="p1"><span class="Apple-converted-space">        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>options: { plugins: { legend: { labels: { color: '#00FF41' } } }, scales: { x: { ticks: { color: '#00FF41' } }, y: { ticks: { color: '#00FF41' } } } }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// Matrix Animation</p>
+<p class="p1">const canvas = document.getElementById('matrix-bg');</p>
+<p class="p1">const ctxM = canvas.getContext('2d');</p>
+<p class="p1">canvas.width = window.innerWidth; canvas.height = window.innerHeight;</p>
+<p class="p1">const drops = Array(Math.floor(canvas.width/16)).fill(1);</p>
+<p class="p1">function draw() {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ctxM.fillStyle = 'rgba(0,0,0,0.05)'; ctxM.fillRect(0,0,canvas.width,canvas.height);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ctxM.fillStyle = '#0F0';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drops.forEach((y, i) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>ctxM.fillText(Math.floor(Math.random()*2), i*16, y*16);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(y*16 &gt; canvas.height &amp;&amp; Math.random() &gt; 0.975) drops[i] = 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>drops[i]++;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1">}</p>
+<p class="p1">setInterval(draw, 50);</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
