@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Matrix Gym Protocol v6.0</title>
+    <title>Matrix Gym Protocol v7.0</title>
     <link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/150/00FF41/matrix-desktop.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -22,25 +22,25 @@
         .alarm-active { animation: flash red 0.3s infinite; }
         @keyframes flash { 50% { background-color: #900; } }
         .hidden { display: none; }
-        input { background: black; border: 1px solid var(--matrix-green); color: var(--matrix-green); width: 120px; text-align: center; font-size: 1rem; padding: 5px; margin-top: 5px; }
+        input { background: #111; border: 1px solid var(--matrix-green); color: var(--matrix-green); width: 130px; text-align: center; font-size: 1.1rem; padding: 8px; margin-top: 5px; border-radius: 4px; }
     </style>
 </head>
 <body>
 <canvas id="matrix-bg"></canvas>
 
 <div id="unlock-screen" class="timer-overlay">
-    <h2>> PROTOCOLLO_MATRIX_v6</h2>
-    <p style="padding: 20px;">MEMORIA ATTIVA.<br>I PESI VERRANNO SALVATI AUTOMATICAMENTE.</p>
-    <button class="btn" style="width: 80%; font-size: 1.5rem;" onclick="initAudio()">ACCEDI AL SISTEMA</button>
+    <h2>> MATRIX_V7_ULTIMATE</h2>
+    <p style="padding: 20px;">MEMORIA SINCRONIZZATA.<br>I carichi si salvano mentre scrivi.</p>
+    <button class="btn" style="width: 80%; font-size: 1.5rem;" onclick="initAudio()">CARICA PROTOCOLLO</button>
 </div>
 
 <div class="container hidden" id="home">
-    <h1>> DASHBOARD_PROGRESSI</h1>
+    <h1>> DASHBOARD_OPERATIVA</h1>
     <div class="card"><canvas id="progressChart" height="180"></canvas></div>
-    <button class="btn" onclick="openDay(1)">BOOT: GIORNO_1 (GAMBE/SPALLE)</button>
-    <button class="btn" onclick="openDay(2)">BOOT: GIORNO_2 (DORSO/PETTO)</button>
-    <button class="btn" onclick="openDay(3)">BOOT: GIORNO_3 (MIX/GAMBE)</button>
-    <button class="btn" style="color: grey; border-color: grey; font-size: 0.6rem; margin-top: 20px;" onclick="clearStorage()">[ RESET MEMORIA PESI ]</button>
+    <button class="btn" onclick="openDay(1)">GIORNO_1 (GAMBE/SPALLE)</button>
+    <button class="btn" onclick="openDay(2)">GIORNO_2 (DORSO/PETTO)</button>
+    <button class="btn" onclick="openDay(3)">GIORNO_3 (MIX/GAMBE)</button>
+    <button class="btn" style="color: #666; border-color: #444; font-size: 0.6rem; margin-top: 20px;" onclick="clearStorage()">[ RESET TOTALE MEMORIA ]</button>
 </div>
 
 <div class="container hidden" id="workout-view">
@@ -50,9 +50,9 @@
 </div>
 
 <div id="timer-overlay" class="timer-overlay hidden">
-    <div id="timer-label" style="font-size: 1.5rem;">RECUPERO_IN_CORSO</div>
+    <div id="timer-label" style="font-size: 1.5rem;">RECUPERO_ATTIVO</div>
     <div class="timer-display" id="timer-text">00:00</div>
-    <button id="stop-btn" class="btn hidden" style="border-color: var(--ss-red); color: var(--ss-red); font-size: 1.8rem; width: 80%;" onclick="stopAlarm()">FERMA SIRENA</button>
+    <button id="stop-btn" class="btn hidden" style="border-color: var(--ss-red); color: var(--ss-red); font-size: 1.8rem; width: 80%;" onclick="stopAlarm()">STOP SIRENA</button>
 </div>
 
 <script>
@@ -99,8 +99,10 @@ function initAudio() {
     initChart();
 }
 
+// SALVATAGGIO IMMEDIATO AD OGNI TASTO PREMUTO
 function saveWeight(id, value) {
     localStorage.setItem('matrix_weight_' + id, value);
+    console.log("Salvato: " + id + " = " + value);
 }
 
 function getWeight(id, defaultValue) {
@@ -126,8 +128,8 @@ function openDay(day) {
         html += `<div class="card ${ex.ss ? 'ss-card' : ''}">
                 <div class="sets-counter" id="cnt-${id}">0/${ex.total}</div>
                 <strong>${ex.name}</strong><br><br>
-                <span>KG: <input type="text" value="${savedWeight}" onchange="saveWeight('${id}', this.value)"></span><br>
-                ${ex.rest > 0 ? `<button class="btn" style="margin-top:10px;" onclick="handleNextSet('${id}', ${ex.total}, ${ex.rest})">SERIE + RECUPERO ${ex.rest}s</button>` : `<button class="btn" style="margin-top:10px;" onclick="handleNextSet('${id}', ${ex.total}, 0)">FATTO</button>`}
+                <span>KG: <input type="text" id="input-${id}" value="${savedWeight}" oninput="saveWeight('${id}', this.value)"></span><br>
+                ${ex.rest > 0 ? `<button class="btn" style="margin-top:10px;" onclick="handleNextSet('${id}', ${ex.total}, ${ex.rest})">SERIE + RECUPERO</button>` : `<button class="btn" style="margin-top:10px;" onclick="handleNextSet('${id}', ${ex.total}, 0)">FATTO</button>`}
             </div>`;
     });
     document.getElementById('exercise-list').innerHTML = html;
@@ -165,11 +167,10 @@ function triggerAlarm() {
         let g = audioCtx.createGain();
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(800 + Math.random() * 400, audioCtx.currentTime);
-        osc.connect(g);
-        g.connect(mainGain);
+        osc.connect(g); g.connect(mainGain);
         g.gain.setValueAtTime(0.5, audioCtx.currentTime);
         osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-        if(navigator.vibrate) navigator.vibrate([300, 100, 300]);
+        if(navigator.vibrate) navigator.vibrate(500);
     }, 400);
 }
 
@@ -181,7 +182,7 @@ function stopAlarm() {
 
 function initChart() {
     const ctx = document.getElementById('progressChart').getContext('2d');
-    new Chart(ctx, { type: 'line', data: { labels: ['Sett 1', 'Oggi'], datasets: [{ label: 'Performance', data: [100, 150], borderColor: '#00FF41', tension: 0.3 }] }, options: { plugins: { legend: { display:false } }, scales: { x: { ticks: { color: '#00FF41' } }, y: { ticks: { color: '#00FF41' } } } } });
+    new Chart(ctx, { type: 'line', data: { labels: ['Sett 1', 'Oggi'], datasets: [{ label: 'Carico Totale', data: [100, 150], borderColor: '#00FF41', tension: 0.3 }] }, options: { plugins: { legend: { display:false } }, scales: { x: { ticks: { color: '#00FF41' } }, y: { ticks: { color: '#00FF41' } } } } });
 }
 
 const canvas = document.getElementById('matrix-bg');
