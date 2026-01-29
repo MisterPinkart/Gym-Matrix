@@ -7,99 +7,130 @@
     <link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/150/00FF41/matrix-desktop.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --matrix-green: #00FF41; --dark-bg: #000; --card-bg: rgba(0, 20, 0, 0.95); --ss-red: #ff3131; }
-        body { background-color: var(--dark-bg); color: var(--matrix-green); font-family: 'Courier New', Courier, monospace; margin: 0; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        :root { --matrix-green: #00FF41; --dark-bg: #000; --card-bg: rgba(0, 15, 0, 0.95); --ss-red: #ff3131; }
+        body { background-color: var(--dark-bg); color: var(--matrix-green); font-family: 'Courier New', Courier, monospace; margin: 0; overflow-x: hidden; }
         #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.15; }
-        .container { padding: 15px; max-width: 600px; margin: auto; }
+        .container { padding: 15px; max-width: 600px; margin: auto; padding-bottom: 100px; }
         h1, h2 { text-transform: uppercase; text-align: center; border-bottom: 2px solid var(--matrix-green); padding-bottom: 10px; text-shadow: 0 0 10px var(--matrix-green); font-size: 1.2rem; }
         .card { background: var(--card-bg); border: 1px solid var(--matrix-green); border-radius: 8px; padding: 15px; margin-bottom: 20px; position: relative; }
         .ss-card { border: 2px solid var(--ss-red); box-shadow: 0 0 15px rgba(255, 49, 49, 0.4); }
         .sets-counter { position: absolute; top: 10px; right: 10px; font-size: 1.5rem; font-weight: bold; border: 1px solid var(--matrix-green); padding: 5px; background: rgba(0,255,65,0.1); }
         .btn { background: transparent; color: var(--matrix-green); border: 1px solid var(--matrix-green); width: 100%; padding: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 10px; font-size: 0.9rem; }
         .btn:active { background: var(--matrix-green); color: black; }
-        .timer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .timer-display { font-size: 4rem; text-shadow: 0 0 20px var(--matrix-green); }
-        .alarm-active { animation: flash red 0.5s infinite; }
-        @keyframes flash { 50% { background-color: #600; } }
+        .timer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .timer-display { font-size: 5rem; text-shadow: 0 0 20px var(--matrix-green); }
+        .alarm-active { animation: flash red 0.3s infinite; }
+        @keyframes flash { 50% { background-color: #900; } }
         .hidden { display: none; }
-        input { background: black; border: 1px solid var(--matrix-green); color: var(--matrix-green); width: 100px; text-align: center; font-size: 1rem; }
+        input { background: black; border: 1px solid var(--matrix-green); color: var(--matrix-green); width: 110px; text-align: center; font-size: 1rem; }
     </style>
 </head>
 <body>
 <canvas id="matrix-bg"></canvas>
+
 <div id="unlock-screen" class="timer-overlay">
-    <h2>> PROTOCOLLO_MATRIX</h2>
-    <p style="padding: 20px;">ATTIVA SISTEMA PER AUDIO E VIBRAZIONE</p>
-    <button class="btn" style="width: 80%; font-size: 1.2rem;" onclick="initAudio()">INIZIALIZZA</button>
+    <h2>> PROTOCOLLO_MATRIX_v5</h2>
+    <p style="padding: 20px;">SISTEMA AUDIO PRONTO.<br>ALZA IL VOLUME E TOGLI IL SILENZIOSO.</p>
+    <button class="btn" style="width: 80%; font-size: 1.5rem;" onclick="initAudio()">ACCEDI AL SISTEMA</button>
 </div>
+
 <div class="container hidden" id="home">
-    <h1>> SYSTEM_ONLINE</h1>
-    <div class="card"><canvas id="progressChart" height="200"></canvas></div>
-    <button class="btn" onclick="openDay(1)">BOOT: GIORNO_1</button>
-    <button class="btn" onclick="openDay(2)">BOOT: GIORNO_2</button>
-    <button class="btn" onclick="openDay(3)">BOOT: GIORNO_3</button>
+    <h1>> DASHBOARD_PROGRESSI</h1>
+    <div class="card"><canvas id="progressChart" height="180"></canvas></div>
+    <button class="btn" onclick="openDay(1)">BOOT: GIORNO_1 (GAMBE/SPALLE)</button>
+    <button class="btn" onclick="openDay(2)">BOOT: GIORNO_2 (DORSO/PETTO)</button>
+    <button class="btn" onclick="openDay(3)">BOOT: GIORNO_3 (GAMBE/SPALLE 2)</button>
 </div>
+
 <div class="container hidden" id="workout-view">
-    <button class="btn" style="border:none; color:#666; font-size:0.7rem;" onclick="location.reload()">[ ESCI_SESSIONE ]</button>
+    <button class="btn" style="border:none; color:#666; font-size:0.7rem;" onclick="location.reload()">[ ESCI ]</button>
     <h2 id="current-day-title"></h2>
     <div id="exercise-list"></div>
 </div>
+
 <div id="timer-overlay" class="timer-overlay hidden">
-    <div id="timer-label" style="font-size: 1.2rem;">RECUPERO_IN_CORSO</div>
+    <div id="timer-label" style="font-size: 1.5rem;">RECUPERO_IN_CORSO</div>
     <div class="timer-display" id="timer-text">00:00</div>
-    <button id="stop-btn" class="btn hidden" style="border-color: var(--ss-red); color: var(--ss-red); font-size: 1.5rem; width: 80%;" onclick="stopAlarm()">🛑 STOP SIRENA</button>
+    <button id="stop-btn" class="btn hidden" style="border-color: var(--ss-red); color: var(--ss-red); font-size: 1.8rem; width: 80%;" onclick="stopAlarm()">FERMA SIRENA</button>
 </div>
+
 <script>
-let audioCtx, mainGain, oscillator, alarmInterval;
+let audioCtx, mainGain, alarmInterval;
 let currentSets = {};
 let activeInterval;
+
+// TUTTI I TUOI ESERCIZI DALLA FOTO
 const workoutData = {
     1: [
-        { name: "SS: AFFONDI + LEG CURL", total: 4, rest: 120, ss: true, last: "40kg/45kg" },
+        { name: "10 MINUTI ELLITTICA", total: 1, rest: 0, last: "1.6 km" },
+        { name: "SS: AFFONDI + LEG CURL SEDUTO", total: 4, rest: 120, ss: true, last: "40kg/45kg" },
+        { name: "LEG CURL", total: 4, rest: 90, ss: false, last: "30kg" },
         { name: "SHOULDER PRESS", total: 4, rest: 120, ss: false, last: "30kg" },
-        { name: "ALZATE LATERALI", total: 4, rest: 120, ss: false, last: "5kg" },
-        { name: "ALZATE FRONTALI", total: 3, rest: 90, ss: false, last: "6kg" }
+        { name: "ALZATE LATERALI SEDUTO", total: 4, rest: 120, ss: false, last: "5kg" },
+        { name: "ALZATE FRONTALI ALTERNATE", total: 3, rest: 90, ss: false, last: "6kg" },
+        { name: "CALF SU STEP (UN ARTO)", total: 8, rest: 45, ss: false, last: "20kg" },
+        { name: "20 MIN TAPPETO PENDENZA", total: 1, rest: 0, last: "11,5% 4.5kmh" }
     ],
     2: [
-        { name: "LAT MACHINE LARGA", total: 4, rest: 90, ss: false, last: "40kg" },
-        { name: "PULLEY BASSO", total: 4, rest: 120, ss: false, last: "30kg" },
-        { name: "LAT STRETTA", total: 4, rest: 120, ss: false, last: "45kg" },
-        { name: "PANCA INCLINATA", total: 5, rest: 90, ss: false, last: "12.5kg" }
+        { name: "10 MINUTI ELLITTICA", total: 1, rest: 0, last: "1.6 km" },
+        { name: "LAT MACHINE PRONA", total: 4, rest: 90, ss: false, last: "40kg" },
+        { name: "PULLEY BASSO TRIANGOLO", total: 4, rest: 120, ss: false, last: "30kg" },
+        { name: "LAT MACHINE STRETTA", total: 4, rest: 120, ss: false, last: "45kg" },
+        { name: "PANCA INCLINATA", total: 5, rest: 90, ss: false, last: "12.5kg+bil" },
+        { name: "APERTURE PANCA PIANA", total: 5, rest: 90, ss: false, last: "5kg" },
+        { name: "10 MIN TAPPETO PENDENZA", total: 1, rest: 0, last: "11,5% 4.5kmh" }
     ],
     3: [
-        { name: "STEP UP BOX", total: 4, rest: 90, ss: false, last: "40kg" },
+        { name: "10 MINUTI ELLITTICA", total: 1, rest: 0, last: "1.6 km" },
+        { name: "STEP UP SU BOX", total: 4, rest: 90, ss: false, last: "40kg" },
         { name: "LEG EXTENSION", total: 5, rest: 120, ss: false, last: "45kg" },
+        { name: "LEG CURL IN PIEDI", total: 4, rest: 90, ss: false, last: "30kg" },
         { name: "SS: ALZATE FRONT + SHOULDER", total: 4, rest: 120, ss: true, last: "12.5/25kg" },
-        { name: "ALZATE LATERALI PIEDI", total: 5, rest: 90, ss: false, last: "6kg" }
+        { name: "ALZATE LATERALI IN PIEDI", total: 5, rest: 90, ss: false, last: "6kg" },
+        { name: "CALF SU STEP (UN ARTO)", total: 8, rest: 45, ss: false, last: "20kg" }
     ]
 };
+
 function initAudio() {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     mainGain = audioCtx.createGain();
     mainGain.connect(audioCtx.destination);
+    // Beep di test per confermare sblocco
+    const osc = audioCtx.createOscillator();
+    osc.connect(mainGain);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    
     document.getElementById('unlock-screen').classList.add('hidden');
     document.getElementById('home').classList.remove('hidden');
     initChart();
 }
+
 function openDay(day) {
     document.getElementById('home').classList.add('hidden');
     document.getElementById('workout-view').classList.remove('hidden');
-    document.getElementById('current-day-title').innerText = "SESSIONE_GIORNO_" + day;
+    document.getElementById('current-day-title').innerText = "GIORNO_" + day;
     let html = "";
     workoutData[day].forEach((ex, idx) => {
         const id = `d${day}_e${idx}`;
         currentSets[id] = 0;
-        html += `<div class="card ${ex.ss ? 'ss-card' : ''}"><div class="sets-counter" id="cnt-${id}">0/${ex.total}</div><strong>${ex.name}</strong><br><br><span>CARICO: <input type="text" value="${ex.last}"></span><br><button class="btn" style="margin-top:10px;" onclick="handleNextSet('${id}', ${ex.total}, ${ex.rest})">SERIE COMPLETA</button></div>`;
+        html += `<div class="card ${ex.ss ? 'ss-card' : ''}">
+                <div class="sets-counter" id="cnt-${id}">0/${ex.total}</div>
+                <strong>${ex.name}</strong><br><br>
+                <span>KG: <input type="text" value="${ex.last}"></span><br>
+                ${ex.rest > 0 ? `<button class="btn" style="margin-top:10px;" onclick="handleNextSet('${id}', ${ex.total}, ${ex.rest})">SERIE + RECUPERO ${ex.rest}s</button>` : `<button class="btn" style="margin-top:10px;" onclick="handleNextSet('${id}', ${ex.total}, 0)">FATTO</button>`}
+            </div>`;
     });
     document.getElementById('exercise-list').innerHTML = html;
 }
+
 function handleNextSet(id, total, rest) {
     if (currentSets[id] < total) {
         currentSets[id]++;
         document.getElementById(`cnt-${id}`).innerText = `${currentSets[id]}/${total}`;
     }
-    startTimer(rest);
+    if(rest > 0) startTimer(rest);
 }
+
 function startTimer(sec) {
     clearInterval(activeInterval);
     document.getElementById('timer-overlay').classList.remove('hidden');
@@ -114,25 +145,40 @@ function startTimer(sec) {
         timeLeft--;
     }, 1000);
 }
+
 function triggerAlarm() {
-    document.getElementById('timer-label').innerText = "🚨 TORNA AL LAVORO! 🚨";
+    document.getElementById('timer-label').innerText = "🚨 MUOVITI! 🚨";
     document.getElementById('timer-overlay').classList.add('alarm-active');
     document.getElementById('stop-btn').classList.remove('hidden');
+    
+    // Sirena Ultra Fastidiosa
     alarmInterval = setInterval(() => {
-        oscillator = audioCtx.createOscillator();
-        oscillator.type = 'sawtooth';
-        oscillator.frequency.setValueAtTime(Math.random() * 200 + 400, audioCtx.currentTime);
-        oscillator.connect(mainGain);
-        mainGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.2);
-        if(navigator.vibrate) navigator.vibrate(500);
+        let osc = audioCtx.createOscillator();
+        let g = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800 + Math.random() * 400, audioCtx.currentTime);
+        osc.connect(g);
+        g.connect(mainGain);
+        g.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+        if(navigator.vibrate) navigator.vibrate([300, 100, 300]);
     }, 400);
 }
-function stopAlarm() { clearInterval(alarmInterval); document.getElementById('timer-overlay').classList.add('hidden'); document.getElementById('timer-overlay').classList.remove('alarm-active'); }
+
+function stopAlarm() {
+    clearInterval(alarmInterval);
+    document.getElementById('timer-overlay').classList.add('hidden');
+    document.getElementById('timer-overlay').classList.remove('alarm-active');
+    if(navigator.vibrate) navigator.vibrate(0);
+}
+
 function initChart() {
     const ctx = document.getElementById('progressChart').getContext('2d');
-    new Chart(ctx, { type: 'line', data: { labels: ['Sett 1', 'Sett 10'], datasets: [{ label: 'Performance (kg)', data: [10, 45], borderColor: '#00FF41' }] }, options: { plugins: { legend: { labels: { color: '#00FF41' } } }, scales: { x: { ticks: { color: '#00FF41' } }, y: { ticks: { color: '#00FF41' } } } } });
+    new Chart(ctx, { type: 'line', data: { labels: ['Sett 1', 'Sett 10'], datasets: [{ label: 'Carico Tot (kg)', data: [100, 250], borderColor: '#00FF41', tension: 0.3 }] }, options: { plugins: { legend: { display:false } }, scales: { x: { ticks: { color: '#00FF41' } }, y: { ticks: { color: '#00FF41' } } } } });
 }
+
+// Matrix background
 const canvas = document.getElementById('matrix-bg');
 const ctxM = canvas.getContext('2d');
 canvas.width = window.innerWidth; canvas.height = window.innerHeight;
